@@ -77,11 +77,9 @@ public:
 
     std::vector<cv::Mat_<double> > Predict(const std::vector<cv::Mat_<uchar> >& images,
                                            const std::vector<BoundingBox>& bounding_boxs,
-                                           const std::vector<cv::Mat_<double> >& ground_truth_shapes,
-                                           int initial_num);
+                                           const std::vector<cv::Mat_<double> >& ground_truth_shapes);
     cv::Mat_<double>  Predict(const cv::Mat_<uchar>& image,
-                              const BoundingBox& bounding_box,
-                              int initial_num);
+                              const BoundingBox& bounding_box);
     void WriteRegressor(std::ofstream& fout);
     void ReadRegressor(std::ifstream& fin);
 

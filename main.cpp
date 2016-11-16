@@ -16,13 +16,12 @@ void PrintHelp(){
 
 }
 
-int save_count=0;
-
-void detect_faces(Mat & small_img, CascadeClassifier& cascade, vector<Rect> & out_faces)
+vector<Rect> detect_faces(Mat & small_img, CascadeClassifier& cascade)
 {
-    // --Detection
+    vector<Rect> faces;
+
     double t = (double)cvGetTickCount();
-    cascade.detectMultiScale( small_img, out_faces,
+    cascade.detectMultiScale( small_img, faces,
         1.1, 2, 0
         //|CV_HAAR_FIND_BIGGEST_OBJECT
         //|CV_HAAR_DO_ROUGH_SEARCH
@@ -42,39 +41,73 @@ void detect_faces(Mat & small_img, CascadeClassifier& cascade, vector<Rect> & ou
                                  Size(30, 30) );
         for(Rect &r : fliped_faces)
         {
-            out_faces.push_back(Rect(small_img.cols - r.x - r.width, r.y, r.width, r.height));
+            faces.push_back(Rect(small_img.cols - r.x - r.width, r.y, r.width, r.height));
         }
     }
 
     t = (double)cvGetTickCount() - t;
     printf( "detection time = %g ms\n", t/((double)cvGetTickFrequency()*1000.) );
+
+    return faces;
 }
 
-void align_faces_and_draw(Mat &img, Mat & gray, vector<Rect> &faces, LBFRegressor& regressor, double scale)
+vector<Rect> detect_faces_with_scale(Mat & img, CascadeClassifier& cascade, double scale)
 {
-    // --Alignment
+    Mat small_img( cvRound (img.rows/scale), cvRound(img.cols/scale), CV_8UC1 );
+    resize( img, small_img, small_img.size(), 0, 0, INTER_LINEAR );
+    equalizeHist( small_img, small_img );
+
+    vector<Rect> faces = detect_faces(small_img, cascade);
+
+    for (Rect & r : faces) {
+        r.x *= scale;
+        r.y *= scale;
+        r.width *= scale;
+        r.height *= scale;
+    }
+
+    return faces;
+}
+
+Mat_<double> align_face(Mat & gray, Rect & r, LBFRegressor& regressor)
+{
     double t = (double)cvGetTickCount();
+    Point center;
+    BoundingBox boundingbox;
 
+    boundingbox.start_x = r.x;
+    boundingbox.start_y = r.y;
+    boundingbox.width   = r.width - 1;
+    boundingbox.height  = r.height - 1;
+    boundingbox.centroid_x = boundingbox.start_x + boundingbox.width/2.0;
+    boundingbox.centroid_y = boundingbox.start_y + boundingbox.height/2.0;
+
+    Mat_<double> current_shape = regressor.Predict(gray, boundingbox);
+
+    t = (double)cvGetTickCount() - t;
+    printf( "alignment time = %g ms\n", t/((double)cvGetTickFrequency()*1000.) );
+
+    return current_shape;
+}
+
+vector<Mat_<double>> align_faces(Mat & gray, vector<Rect> & faces, LBFRegressor& regressor)
+{
+    vector<Mat_<double>> result;
     for(Rect& r : faces) {
-        Point center;
-        BoundingBox boundingbox;
+        result.push_back(align_face(gray, r, regressor));
+    }
+    return result;
+}
 
-        boundingbox.start_x = r.x*scale;
-        boundingbox.start_y = r.y*scale;
-        boundingbox.width   = (r.width-1)*scale;
-        boundingbox.height  = (r.height-1)*scale;
-        boundingbox.centroid_x = boundingbox.start_x + boundingbox.width/2.0;
-        boundingbox.centroid_y = boundingbox.start_y + boundingbox.height/2.0;
 
-        t = (double)cvGetTickCount();
 
-        Mat_<double> current_shape = regressor.Predict(gray, boundingbox, 1);
-
-        t = (double)cvGetTickCount() - t;
-        printf( "alignment time = %g ms\n", t/((double)cvGetTickFrequency()*1000.) );
+void draw_faces(Mat & img, vector<Mat_<double>> &shapes)
+{
+    int save_count=0;
+    for(auto current_shape: shapes) {
         // draw bounding box
 
-        // rectangle(img, cvPoint(boundingbox.start_x,boundingbox.start_y),
+        // rectangle(out_img, cvPoint(boundingbox.start_x,boundingbox.start_y),
         //           cvPoint(boundingbox.start_x+boundingbox.width,boundingbox.start_y+boundingbox.height),Scalar(0,255,0), 1, 8, 0);
 
         // draw result :: red
@@ -91,29 +124,21 @@ void align_faces_and_draw(Mat &img, Mat & gray, vector<Rect> &faces, LBFRegresso
     }
 }
 
-void align_image(Mat& img,
-                 CascadeClassifier& cascade,
-                 LBFRegressor& regressor)
+void align_image_and_draw(Mat& img,
+                          CascadeClassifier& cascade,
+                          LBFRegressor& regressor)
 {
-    vector<Rect> faces;
-    double scale = global.config.scale;
-
-    Mat small_img( cvRound (img.rows/scale), cvRound(img.cols/scale), CV_8UC1 );
     Mat gray;
     cvtColor( img, gray, CV_BGR2GRAY );
 
-    resize( gray, small_img, small_img.size(), 0, 0, INTER_LINEAR );
-    equalizeHist( small_img, small_img );
-
-    detect_faces(small_img, cascade, faces);
-
-    align_faces_and_draw(img, gray, faces, regressor, scale);
-
+    vector<Rect> faces = detect_faces_with_scale(gray, cascade, global.config.scale);
+    vector<Mat_<double>> shapes = align_faces(gray, faces, regressor);
+    draw_faces(img, shapes);
 }
 
-void align_captures(CvCapture *capture,
-                    CascadeClassifier& cascade,
-                    LBFRegressor& regressor)
+void align_captures_and_draw(CvCapture *capture,
+                             CascadeClassifier& cascade,
+                             LBFRegressor& regressor)
 {
     Mat frame, frameCopy;
 
@@ -127,7 +152,7 @@ void align_captures(CvCapture *capture,
         else
             flip( frame, frameCopy, 0 );
 
-        align_image( frameCopy, cascade,regressor);
+        align_image_and_draw( frameCopy, cascade,regressor);
 
         if( waitKey( 10 ) >= 0 )
             break;
@@ -136,9 +161,9 @@ void align_captures(CvCapture *capture,
     cvReleaseCapture( &capture );
 }
 
-void align_filename_list(string filename,
-                    CascadeClassifier& cascade,
-                    LBFRegressor& regressor)
+void align_filename_list_and_draw(string filename,
+                                  CascadeClassifier& cascade,
+                                  LBFRegressor& regressor)
 {
     /* Input is a text file containing the list of the image filenames to be
        processed - one per line */
@@ -156,7 +181,7 @@ void align_filename_list(string filename,
             cout << "file " << buf << endl;
             image = imread( buf, 1 );
             if( !image.empty() ){
-                align_image(image, cascade, regressor);
+                align_image_and_draw(image, cascade, regressor);
                 c = waitKey(0);
                 if( c == 27 || c == 'q' || c == 'Q' )
                     break;
@@ -214,14 +239,14 @@ int align_inputname(string input_name) {
     // cvNamedWindow( "result", 1 );
     // -- 2. Read the video stream
     if( capture ){
-        align_captures(capture, cascade, regressor);
+        align_captures_and_draw(capture, cascade, regressor);
     }
     else if( !image.empty() ){
-        align_image( image, cascade, regressor);
+        align_image_and_draw( image, cascade, regressor);
         waitKey(0);
     }
     else if( !input_name.empty() ){
-        align_filename_list(input_name, cascade, regressor);
+        align_filename_list_and_draw(input_name, cascade, regressor);
     }
 
     cvDestroyWindow("result");

@@ -359,8 +359,7 @@ void LBFRegressor::ReleaseFeatureSpace(struct feature_node ** binfeatures,
 
 vector<Mat_<double> > LBFRegressor::Predict(const vector<Mat_<uchar> >& images,
                                     const vector<BoundingBox>& bounding_boxs,
-                                    const vector<Mat_<double> >& ground_truth_shapes,
-                                    int initial_num){
+                                    const vector<Mat_<double> >& ground_truth_shapes){
 
     vector<Mat_<double> > current_shapes;
 
@@ -397,8 +396,7 @@ vector<Mat_<double> > LBFRegressor::Predict(const vector<Mat_<uchar> >& images,
 }
 
 Mat_<double>  LBFRegressor::Predict(const cv::Mat_<uchar>& image,
-                                    const BoundingBox& bounding_box,
-                                    int initial_num){
+                                    const BoundingBox& bounding_box){
     vector<Mat_<uchar> > images;
     vector<Mat_<double> > current_shapes;
     vector<BoundingBox>  bounding_boxs;
