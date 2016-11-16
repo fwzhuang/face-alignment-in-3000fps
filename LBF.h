@@ -11,6 +11,7 @@
 #include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "Config.h"
 
 #include <cctype>
 #include <iostream>
@@ -28,23 +29,10 @@
 #include <cmath>
 #include <vector>
 #include <fstream>
-#include <numeric>   
-#include <utility> 
+#include <numeric>
+#include <utility>
 
-struct Params{
-    
-    double bagging_overlap;
-    int max_numtrees;
-    int max_depth;
-    int landmark_num;// to be decided
-    int initial_num;
-    
-    int max_numstage;
-    double max_radio_radius[10];
-    int max_numfeats[10]; // number of pixel pairs
-    int max_numthreshs;
-};
-extern Params global_params;
+extern Config global_params;
 extern std::string modelPath;
 extern std::string dataPath;
 class BoundingBox{
@@ -62,7 +50,7 @@ class BoundingBox{
             height = 0;
             centroid_x = 0;
             centroid_y = 0;
-        }; 
+        };
 };
 cv::Mat_<double> GetMeanShape(const std::vector<cv::Mat_<double> >& shapes,
                               const std::vector<BoundingBox>& bounding_box);
