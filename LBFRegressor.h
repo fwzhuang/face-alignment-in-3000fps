@@ -82,8 +82,6 @@ public:
     cv::Mat_<double>  Predict(const cv::Mat_<uchar>& image,
                               const BoundingBox& bounding_box,
                               int initial_num);
-    void WriteGlobalParam(std::ofstream& fout);
-    void ReadGlobalParam(std::ifstream& fin);
     void WriteRegressor(std::ofstream& fout);
     void ReadRegressor(std::ifstream& fin);
 

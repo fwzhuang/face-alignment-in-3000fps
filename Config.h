@@ -12,6 +12,8 @@ class Config {
 
   Config();
   void read(std::string path);
+  void read(std::ifstream &file);
+  void write(std::ofstream &file);
 
   double bagging_overlap;
   int max_numtrees;

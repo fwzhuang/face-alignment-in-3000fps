@@ -103,7 +103,6 @@ void adjustImage(cv::Mat_<uchar>& img,
 void  TrainModel(std::vector<std::string> trainDataName);
 double TestModel(std::vector<std::string> testDataName);
 int FaceDetectionAndAlignment(const char* inputname);
-void ReadGlobalParamFromFile(std::string path);
 double CalculateError(const cv::Mat_<double>& ground_truth_shape, const cv::Mat_<double>& predicted_shape);
 
 }

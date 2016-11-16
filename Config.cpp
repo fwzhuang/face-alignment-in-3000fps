@@ -32,6 +32,11 @@ Config::Config() {
 void Config::read(string path) {
   ifstream file;
   file.open(path);
+  this->read(file);
+  file.close();
+}
+
+void Config::read(ifstream &file) {
   file >> bagging_overlap;
   file >> max_numtrees;
   file >> max_depth;
@@ -47,7 +52,29 @@ void Config::read(string path) {
   for (int i = 0; i < max_numstage; i++){
     file >> max_numfeats[i];
   }
-  file.close();
 }
+
+
+void Config::write(ofstream &file) {
+  file << bagging_overlap << endl;
+  file << max_numtrees << endl;
+  file << max_depth << endl;
+  file << max_numthreshs << endl;
+  file << landmark_num << endl;
+  file << initial_num << endl;
+  file << max_numstage << endl;
+
+  for (int i = 0; i< max_numstage; i++){
+    file << max_radio_radius[i] << " ";
+
+  }
+  file << endl;
+
+  for (int i = 0; i < max_numstage; i++){
+    file << max_numfeats[i] << " ";
+  }
+  file << endl;
+}
+
 
 }

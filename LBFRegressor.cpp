@@ -408,33 +408,11 @@ Mat_<double>  LBFRegressor::Predict(const cv::Mat_<uchar>& image,
     bounding_boxs.push_back(bounding_box);
     current_shapes.push_back(ReProjectShape(mean_shape_, bounding_box));
 
-//    Mat img = imread("/Users/lequan/workspace/LBF/Datasets/lfpw/testset/image_0078.png");
-//    // draw result :: red
-//    for(int j = 0;j < global.config.landmark_num;j++){
-//        circle(img,Point2d(current_shapes[0](j,0),current_shapes[0](j,1)),1,Scalar(255,255,255),-1,8,0);
-//    }
-//    imshow("result", img);
-//    waitKey(0);
-//    string name = "example mean.jpg";
-//    imwrite(name,img);
-
-
     for ( int stage = 0; stage < global.config.max_numstage; stage++){
         struct feature_node ** binfeatures ;
         binfeatures = DeriveBinaryFeat(RandomForest_[stage],images,current_shapes,bounding_boxs);
         GlobalPrediction(binfeatures, current_shapes,bounding_boxs,stage);
         ReleaseFeatureSpace(binfeatures, images.size());
-
-//        Mat image = imread("/Users/lequan/workspace/LBF/Datasets/afw/image_0078.png");
-//        // draw result :: red
-//        for(int j = 0;j < global.config.landmark_num;j++){
-//            circle(image,Point2d(current_shapes[0](j,0),current_shapes[0](j,1)),1,Scalar(255,255,255),-1,8,0);
-//        }
-//        imshow("result", image);
-//        waitKey(0);
-//        string name = "example "+ to_string(stage) + ".jpg";
-//        imwrite(name,image);
-
     }
     return current_shapes[0];
 }
@@ -443,44 +421,22 @@ void LBFRegressor::Save(string path){
     cout << endl<<"Saving model..." << endl;
     ofstream fout;
     fout.open(path);
-    // write the Regressor to file
-    WriteGlobalParam(fout);
+    global.config.write(fout);
     WriteRegressor(fout);
     fout.close();
     cout << "End" << endl;
-
-
 }
 
 void LBFRegressor::Load(string path){
     cout << "Loading model from "<< path  << endl;
     ifstream fin;
     fin.open(path);
-    ReadGlobalParam(fin);
+    global.config.read(fin);
     ReadRegressor(fin);
     fin.close();
     cout << "End"<<endl;
 }
-void  LBFRegressor::WriteGlobalParam(ofstream& fout){
-    fout << global.config.bagging_overlap << endl;
-    fout << global.config.max_numtrees << endl;
-    fout << global.config.max_depth << endl;
-    fout << global.config.max_numthreshs << endl;
-    fout << global.config.landmark_num << endl;
-    fout << global.config.initial_num << endl;
-    fout << global.config.max_numstage << endl;
 
-    for (int i = 0; i< global.config.max_numstage; i++){
-        fout << global.config.max_radio_radius[i] << " ";
-
-    }
-    fout << endl;
-
-    for (int i = 0; i < global.config.max_numstage; i++){
-        fout << global.config.max_numfeats[i] << " ";
-    }
-    fout << endl;
-}
 void  LBFRegressor::WriteRegressor(ofstream& fout){
     for(int i = 0;i < global.config.landmark_num;i++){
         fout << mean_shape_(i,0)<<" "<< mean_shape_(i,1)<<" ";
@@ -496,23 +452,6 @@ void  LBFRegressor::WriteRegressor(ofstream& fout){
         }
     }
     fout_reg.close();
-}
-void  LBFRegressor::ReadGlobalParam(ifstream& fin){
-    fin >> global.config.bagging_overlap;
-    fin >> global.config.max_numtrees;
-    fin >> global.config.max_depth;
-    fin >> global.config.max_numthreshs;
-    fin >> global.config.landmark_num;
-    fin >> global.config.initial_num;
-    fin >> global.config.max_numstage;
-
-    for (int i = 0; i< global.config.max_numstage; i++){
-        fin >> global.config.max_radio_radius[i];
-    }
-
-    for (int i = 0; i < global.config.max_numstage; i++){
-        fin >> global.config.max_numfeats[i];
-    }
 }
 
 void LBFRegressor::ReadRegressor(ifstream& fin){

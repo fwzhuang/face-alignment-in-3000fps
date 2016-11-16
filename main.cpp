@@ -31,20 +31,12 @@ int main( int argc, const char** argv ){
     }
 
     if(strcmp(argv[1],"TrainModel")==0){
-        vector<string> trainDataName;
-     // you need to modify this section according to your training dataset
-        trainDataName.push_back("afw");
-        trainDataName.push_back("helen");
-        trainDataName.push_back("lfpw");
-        TrainModel(trainDataName);
+        vector<string> train_data_name = {"afw", "helen", "lfpw"};
+        TrainModel(train_data_name);
     }
     else if (strcmp(argv[1], "TestModel")==0){
-        vector<string> testDataName;
-     // you need to modify this section according to your training dataset
-        testDataName.push_back("ibug");
-     //   testDataName.push_back("helen");
+        vector<string> testDataName = {"ibug"};
         double MRSE = TestModel(testDataName);
-
     }
     else if (strcmp(argv[1], "Demo")==0){
         if (argc == 2){
