@@ -6,7 +6,7 @@ using namespace std;
 
 namespace FaceAlignment {
 
-Config::Config() {
+  Config::Config() : try_flip(false), scale(1.3) {
   bagging_overlap = 0.4;
   max_numtrees = 10;
   max_depth = 5;
@@ -27,6 +27,7 @@ Config::Config() {
   model_path = "../";
   data_path = "../../face-detection-dataset-300W/";
   cascade_name = "haarcascade_frontalface_alt.xml";
+
 }
 
 void Config::read(string path) {
