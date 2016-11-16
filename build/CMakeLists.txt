@@ -19,7 +19,6 @@ set(source
   ../LBF.cpp
   ../TrainModel.cpp
   ../TestModel.cpp
-  ../Facedetect.cpp
   ../Tree.h
   ../Tree.cpp
   ../RandomForest.cpp
