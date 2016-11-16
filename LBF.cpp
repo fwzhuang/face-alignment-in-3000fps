@@ -15,8 +15,6 @@ using namespace cv;
 
 namespace FaceAlignment {
 
-// parameters
-App global;
 
 
 Mat_<double> GetMeanShape(const vector<Mat_<double> >& shapes,
@@ -138,7 +136,7 @@ double calculate_covariance(const vector<double>& v_1,
     return mean(v1.mul(v2))[0];
 }
 Mat_<double> LoadGroundTruthShape(string& filename){
-    Mat_<double> shape(global.config.landmark_num,2);
+    Mat_<double> shape(global_config.landmark_num,2);
     ifstream fin;
     string temp;
 
@@ -146,7 +144,7 @@ Mat_<double> LoadGroundTruthShape(string& filename){
     getline(fin, temp);
     getline(fin, temp);
     getline(fin, temp);
-    for (int i=0;i<global.config.landmark_num;i++){
+    for (int i=0;i<global_config.landmark_num;i++){
         fin >> shape(i,0) >> shape(i,1);
     }
     fin.close();
@@ -267,7 +265,7 @@ void LoadOpencvBbxData(string filepath,
     Mat gray;
 
     // --Detection
-    cascade.load(global.config.cascade_name);
+    cascade.load(global_config.cascade_name);
     string name;
     while(getline(fin,name)){
         name.erase(0, name.find_first_not_of(" \t"));
@@ -369,11 +367,11 @@ void LoadCofwTrainData(vector<Mat_<uchar> >& images,
 
     fin.open("/Users/lequan/workspace/xcode/myopencv/COFW_Dataset/keypoints.txt");
     for(int i = 0;i < img_num;i++){
-        Mat_<double> temp(global.config.landmark_num,2);
-        for(int j = 0;j < global.config.landmark_num;j++){
+        Mat_<double> temp(global_config.landmark_num,2);
+        for(int j = 0;j < global_config.landmark_num;j++){
             fin>>temp(j,0);
         }
-        for(int j = 0;j < global.config.landmark_num;j++){
+        for(int j = 0;j < global_config.landmark_num;j++){
             fin>>temp(j,1);
         }
         ground_truth_shapes.push_back(temp);
@@ -405,11 +403,11 @@ void LoadCofwTestData(vector<Mat_<uchar> >& images,
 
     fin.open("/Users/lequan/workspace/xcode/myopencv/COFW_Dataset/keypoints_test.txt");
     for(int i = 0;i < img_num;i++){
-        Mat_<double> temp(global.config.landmark_num,2);
-        for(int j = 0;j < global.config.landmark_num;j++){
+        Mat_<double> temp(global_config.landmark_num,2);
+        for(int j = 0;j < global_config.landmark_num;j++){
             fin>>temp(j,0);
         }
-        for(int j = 0;j < global.config.landmark_num;j++){
+        for(int j = 0;j < global_config.landmark_num;j++){
             fin>>temp(j,1);
         }
         ground_truth_shapes.push_back(temp);

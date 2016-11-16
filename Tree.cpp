@@ -40,8 +40,8 @@ void Tree::Train(const vector<Mat_<uchar> >& images,
                  ){
     // set the parameter
     landmarkID_ = landmarkID; // start from 0
-    max_numfeats_ = global.config.max_numfeats[stages];
-    max_radio_radius_ = global.config.max_radio_radius[stages];
+    max_numfeats_ = global_config.max_numfeats[stages];
+    max_radio_radius_ = global_config.max_radio_radius[stages];
     num_nodes_ = 1;
     num_leafnodes_ = 1;
 

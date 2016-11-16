@@ -6,7 +6,10 @@ using namespace std;
 
 namespace FaceAlignment {
 
-  Config::Config() : try_flip(false), scale(1.3) {
+Config global_config;
+
+
+Config::Config() : try_flip(false), scale(1.3) {
   bagging_overlap = 0.4;
   max_numtrees = 10;
   max_depth = 5;

@@ -287,7 +287,7 @@ void LBFRegressor::Train(const vector<Mat_<uchar> >& images,
 
     RNG random_generator(getTickCount());
     for(int i = 0;i < images.size();i++){
-        for(int j = 0;j < global.config.initial_num;j++){
+        for(int j = 0;j < global_config.initial_num;j++){
             int index = 0;
             do{
                 // index = (i+j+1) % (images.size());
@@ -310,11 +310,11 @@ void LBFRegressor::Train(const vector<Mat_<uchar> >& images,
     mean_shape_ = GetMeanShape(ground_truth_shapes,bounding_boxs);
     cout << mean_shape_<<endl;
     // train random forest
-    int num_feature = global.config.landmark_num * global.config.max_numtrees * pow(2,(global.config.max_depth-1));
+    int num_feature = global_config.landmark_num * global_config.max_numtrees * pow(2,(global_config.max_depth-1));
     int num_train_sample = (int)augmented_images.size();
 
     double t0 =(double)cvGetTickCount();
-    for (int stage = 0; stage < global.config.max_numstage; stage++){
+    for (int stage = 0; stage < global_config.max_numstage; stage++){
         double t1 =(double)cvGetTickCount();
         GetShapeResidual(augmented_ground_truth_shapes,current_shapes,augmented_bounding_boxs,
                          mean_shape_,shapes_residual_);
@@ -346,7 +346,7 @@ void LBFRegressor::Train(const vector<Mat_<uchar> >& images,
         cout << "the linear model of "<< stage<<" stage has been trained, cost "<< (t4-t3)/((double)cvGetTickFrequency()*1000*1000) <<" s"<<endl<<endl;
 
         cout << "the "<<stage<<" has completed, cost "<<(t4-t0)/((double)cvGetTickFrequency()*1000*1000) <<" s"<<endl;
-        cout << "Remaining time is about "<< (t4-t0)/((double)cvGetTickFrequency()*1000*1000*(stage+1))*(global.config.max_numstage-stage-1)<< "s"<<endl<<endl;
+        cout << "Remaining time is about "<< (t4-t0)/((double)cvGetTickFrequency()*1000*1000*(stage+1))*(global_config.max_numstage-stage-1)<< "s"<<endl<<endl;
     }
 }
 void LBFRegressor::ReleaseFeatureSpace(struct feature_node ** binfeatures,
@@ -374,12 +374,12 @@ vector<Mat_<double> > LBFRegressor::Predict(const vector<Mat_<uchar> >& images,
     cout <<"mean shape "<<", error: "<<MRSE_sum/current_shapes.size()<<endl;
 
     int stage1 =0;
-    for ( int stage = 0; stage < global.config.max_numstage; stage++){
-        if(stage<global.config.max_numstage){
+    for ( int stage = 0; stage < global_config.max_numstage; stage++){
+        if(stage<global_config.max_numstage){
             stage1 = stage;
         }
         else{
-            stage1 = global.config.max_numstage-1;
+            stage1 = global_config.max_numstage-1;
         }
         struct feature_node ** binfeatures ;
         binfeatures = DeriveBinaryFeat(RandomForest_[stage1],images,current_shapes,bounding_boxs);
@@ -406,7 +406,7 @@ Mat_<double>  LBFRegressor::Predict(const cv::Mat_<uchar>& image,
     bounding_boxs.push_back(bounding_box);
     current_shapes.push_back(ReProjectShape(mean_shape_, bounding_box));
 
-    for ( int stage = 0; stage < global.config.max_numstage; stage++){
+    for ( int stage = 0; stage < global_config.max_numstage; stage++){
         struct feature_node ** binfeatures ;
         binfeatures = DeriveBinaryFeat(RandomForest_[stage],images,current_shapes,bounding_boxs);
         GlobalPrediction(binfeatures, current_shapes,bounding_boxs,stage);
@@ -419,7 +419,7 @@ void LBFRegressor::Save(string path){
     cout << endl<<"Saving model..." << endl;
     ofstream fout;
     fout.open(path);
-    global.config.write(fout);
+    global_config.write(fout);
     WriteRegressor(fout);
     fout.close();
     cout << "End" << endl;
@@ -429,20 +429,20 @@ void LBFRegressor::Load(string path){
     cout << "Loading model from "<< path  << endl;
     ifstream fin;
     fin.open(path);
-    global.config.read(fin);
+    global_config.read(fin);
     ReadRegressor(fin);
     fin.close();
     cout << "End"<<endl;
 }
 
 void  LBFRegressor::WriteRegressor(ofstream& fout){
-    for(int i = 0;i < global.config.landmark_num;i++){
+    for(int i = 0;i < global_config.landmark_num;i++){
         fout << mean_shape_(i,0)<<" "<< mean_shape_(i,1)<<" ";
     }
     fout<<endl;
     ofstream fout_reg;
-    fout_reg.open(global.config.model_path + "/Regressor.model",ios::binary);
-    for (int i=0; i < global.config.max_numstage; i++ ){
+    fout_reg.open(global_config.model_path + "/Regressor.model",ios::binary);
+    for (int i=0; i < global_config.max_numstage; i++ ){
         RandomForest_[i].Write(fout);
         fout << Models_[i].size()<< endl;
         for (int j=0; j<Models_[i].size();j++){
@@ -453,13 +453,13 @@ void  LBFRegressor::WriteRegressor(ofstream& fout){
 }
 
 void LBFRegressor::ReadRegressor(ifstream& fin){
-    mean_shape_ = Mat::zeros(global.config.landmark_num,2,CV_64FC1);
-    for(int i = 0;i < global.config.landmark_num;i++){
+    mean_shape_ = Mat::zeros(global_config.landmark_num,2,CV_64FC1);
+    for(int i = 0;i < global_config.landmark_num;i++){
         fin >> mean_shape_(i,0) >> mean_shape_(i,1);
     }
     ifstream fin_reg;
-    fin_reg.open(global.config.model_path + "/Regressor.model",ios::binary);
-    for (int i=0; i < global.config.max_numstage; i++ ){
+    fin_reg.open(global_config.model_path + "/Regressor.model",ios::binary);
+    for (int i=0; i < global_config.max_numstage; i++ ){
         RandomForest_[i].Read(fin);
         int num =0;
         fin >> num;

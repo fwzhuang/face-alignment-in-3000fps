@@ -33,6 +33,10 @@ class Config {
   const double scale;
   const bool try_flip;
 };
+extern Config global_config;
+
 }
+
+
 
 #endif

@@ -24,10 +24,10 @@ public:
 
 
     RandomForest(){
-        max_numtrees_ = global.config.max_numtrees;
-        num_landmark_ = global.config.landmark_num;
-        max_depth_    = global.config.max_depth;
-        overlap_ratio_ = global.config.bagging_overlap;
+        max_numtrees_ = global_config.max_numtrees;
+        num_landmark_ = global_config.landmark_num;
+        max_depth_    = global_config.max_depth;
+        overlap_ratio_ = global_config.bagging_overlap;
 
         // resize the trees
         rfs_.resize(num_landmark_);

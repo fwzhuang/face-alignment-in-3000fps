@@ -35,12 +35,6 @@
 
 namespace FaceAlignment {
 
-class App {
-public:
-  Config config;
-};
-
-extern App global;
 
 class BoundingBox{
     public:

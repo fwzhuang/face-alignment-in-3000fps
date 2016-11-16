@@ -10,6 +10,7 @@
 #define __myopencv__Tree__
 
 #include "LBF.h"
+#include "Config.h"
 
 namespace FaceAlignment {
 
@@ -75,8 +76,8 @@ public:
 
 
     Tree(){
-        overlap_ration_ = global.config.bagging_overlap;
-        max_depth_ = global.config.max_depth;
+        overlap_ration_ = global_config.bagging_overlap;
+        max_depth_ = global_config.max_depth;
         max_numnodes_ = pow(2, max_depth_)-1;
         nodes_.resize(max_numnodes_);
     }
