@@ -14,7 +14,9 @@ namespace FaceAlignment {
 class App {
  public:
 
-  Config config;
+  App(string cascade_model_path,
+      string lbf_model_path,
+      string regressor_model_path);
 
   vector<Rect> detect_faces(Mat & small_img);
 
@@ -33,7 +35,7 @@ class App {
   void align_filename_list_and_draw(string filename);
 
 
-
+private:
 
   CascadeClassifier cascade;
   LBFRegressor regressor;

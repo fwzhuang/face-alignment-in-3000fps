@@ -82,13 +82,6 @@ int align_inputname(App & app, string input_name) {
         }
     }
 
-    app.regressor.Load(global_config.model_path + "LBF.model");
-
-    // -- 1. Load the cascades
-    if( !app.cascade.load( global_config.cascade_name ) ){
-        cerr << "ERROR: Could not load classifier cascade" << endl;
-        return -1;
-    }
 
     // cvNamedWindow( "result", 1 );
     // -- 2. Read the video stream
@@ -113,7 +106,9 @@ int align_inputname(App & app, string input_name) {
 using namespace FaceAlignment;
 
 int main( int argc, const char** argv ){
-    App app;
+    App app(global_config.cascade_name,
+	    global_config.model_path + "LBF.model",
+	    global_config.model_path + "Regressor.model");
 
     bool training = (argc > 1 && strcmp(argv[1], "TrainModel") == 0);
 

@@ -32,7 +32,8 @@ void TrainModel(vector<string> trainDataName){
 
     LBFRegressor regressor;
     regressor.Train(images,ground_truth_shapes,bounding_boxs);
-    regressor.Save(global_config.model_path + "LBF.model");
+    regressor.Save(global_config.model_path + "LBF.model",
+		   global_config.model_path + "Regressor.model");
     return;
 }
 }

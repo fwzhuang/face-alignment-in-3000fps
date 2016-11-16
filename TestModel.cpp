@@ -29,7 +29,8 @@ double TestModel (vector<string> testDataName){
 
 
     LBFRegressor regressor;
-    regressor.Load(global_config.model_path + "LBF.model");
+    regressor.Load(global_config.model_path + "LBF.model",
+		   global_config.model_path + "Regressor.model");
     double t1 =(double)cvGetTickCount();
     vector<Mat_<double> > current_shapes = regressor.Predict(test_images,test_bounding_boxs, test_ground_truth_shapes);
     //vector<Mat_<double> >current_shapes = test_ground_truth_shapes;

@@ -1,6 +1,14 @@
 #include "App.h"
 
+
 namespace FaceAlignment {
+
+App::App(string cascade_model_path, string lbf_model_path, string regressor_model_path) {
+
+  cascade.load(cascade_model_path);
+  regressor.Load(lbf_model_path, regressor_model_path);
+
+}
 
 vector<Rect> App::detect_faces(Mat & small_img)
 {
