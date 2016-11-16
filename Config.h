@@ -2,6 +2,9 @@
 #define Config_H
 #include <string>
 
+using namespace std;
+
+namespace FaceAlignment {
 
 class Config {
 
@@ -20,7 +23,12 @@ class Config {
   double max_radio_radius[10];
   int max_numfeats[10]; // number of pixel pairs
   int max_numthreshs;
-};
 
+  string model_path;
+  string data_path;
+  string cascade_name;
+
+};
+}
 
 #endif

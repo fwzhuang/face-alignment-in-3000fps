@@ -11,6 +11,8 @@
 
 #include "LBF.h"
 
+namespace FaceAlignment {
+
 class Node {
 public:
     //data
@@ -22,7 +24,7 @@ public:
     double thresh;
     double feat[4];
     std::vector<int> ind_samples;
-   
+
     //Constructors
     Node(){
         ind_samples.clear();
@@ -50,7 +52,7 @@ public:
 
 class Tree{
 public:
-    
+
     // id of the landmark
     int landmarkID_;
     // depth of the tree:
@@ -60,21 +62,21 @@ public:
     //number of leaf nodes and nodes
     int num_leafnodes_;
     int num_nodes_;
-    
+
     // sample pixel featurs' number, use when training RF
     int max_numfeats_;
     double max_radio_radius_;
     double overlap_ration_;
-   
+
     // leafnodes id
     std::vector<int> id_leafnodes_;
     // tree nodes
     std::vector<Node> nodes_;
-    
-    
+
+
     Tree(){
-        overlap_ration_ = global_params.bagging_overlap;
-        max_depth_ = global_params.max_depth;
+        overlap_ration_ = global.config.bagging_overlap;
+        max_depth_ = global.config.max_depth;
         max_numnodes_ = pow(2, max_depth_)-1;
         nodes_.resize(max_numnodes_);
     }
@@ -88,7 +90,7 @@ public:
                int stages,
                int landmarkID
                );
-    
+
     //Splite the node
     void Splitnode(const std::vector<cv::Mat_<uchar> >& images,
                    const std::vector<cv::Mat_<double> >& ground_truth_shapes,
@@ -104,18 +106,18 @@ public:
                    std::vector<int>& lcind,
                    std::vector<int>& rcind
                    );
-    
+
     //Predict
     void Predict();
-    
+
     // Read/ write
     void Read(std::ifstream& fin);
     void Write(std:: ofstream& fout);
-    
+
 };
 
 
-
+}
 
 
 #endif /* defined(__myopencv__Tree__) */

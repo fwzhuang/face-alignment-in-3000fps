@@ -20,7 +20,6 @@ set(source
   ../TrainModel.cpp
   ../TestModel.cpp
   ../Facedetect.cpp
-  ../Utils.cpp
   ../Tree.h
   ../Tree.cpp
   ../RandomForest.cpp

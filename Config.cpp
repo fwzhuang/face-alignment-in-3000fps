@@ -4,6 +4,8 @@
 
 using namespace std;
 
+namespace FaceAlignment {
+
 Config::Config() {
   bagging_overlap = 0.4;
   max_numtrees = 10;
@@ -21,6 +23,10 @@ Config::Config() {
   for (int i=0;i<10;i++){
     max_numfeats[i] = m_max_numfeats[i];
   }
+
+  model_path = "../";
+  data_path = "../../face-detection-dataset-300W/";
+  cascade_name = "haarcascade_frontalface_alt.xml";
 }
 
 void Config::read(string path) {
@@ -42,4 +48,6 @@ void Config::read(string path) {
     file >> max_numfeats[i];
   }
   file.close();
+}
+
 }

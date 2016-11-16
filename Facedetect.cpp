@@ -8,24 +8,26 @@
 #include "LBFRegressor.h"
 using namespace std;
 using namespace cv;
+
+namespace FaceAlignment {
+
 int save_count=0;
 void detectAndDraw(Mat& img,
                    CascadeClassifier& nestedCascade, LBFRegressor& regressor,
                    double scale, bool tryflip );
 
 int FaceDetectionAndAlignment(const char* inputname){
-       extern string cascadeName;
     string inputName;
     CvCapture* capture = 0;
     Mat frame, frameCopy, image;
     bool tryflip = false;
     double scale  = 1.3;
     CascadeClassifier cascade;
-    
+
     if (inputname!=NULL){
         inputName.assign(inputname);
     }
-    
+
     // name is empty or a number
     if( inputName.empty() || (isdigit(inputName.c_str()[0]) && inputName.c_str()[1] == '\0') ){
         capture = cvCaptureFromCAM( inputName.empty() ? 0 : inputName.c_str()[0] - '0' );
@@ -54,10 +56,10 @@ int FaceDetectionAndAlignment(const char* inputname){
     }
     // -- 0. Load LBF model
     LBFRegressor regressor;
-    regressor.Load(modelPath+"LBF.model");
-    
+    regressor.Load(global.config.model_path + "LBF.model");
+
     // -- 1. Load the cascades
-    if( !cascade.load( cascadeName ) ){
+    if( !cascade.load( global.config.cascade_name ) ){
         cerr << "ERROR: Could not load classifier cascade" << endl;
         return -1;
     }
@@ -88,7 +90,7 @@ _cleanup_:
         cvReleaseCapture( &capture );
     }
     else{
-       
+
         if( !image.empty() ){
             cout << "In image read" << endl;
             detectAndDraw( image, cascade,regressor,  scale, tryflip );
@@ -107,7 +109,7 @@ _cleanup_:
                         len--;
                     buf[len] = '\0';
                     cout << "file " << buf << endl;
-                    image = imread( buf, 1 );    
+                    image = imread( buf, 1 );
                     if( !image.empty() ){
                         detectAndDraw(image, cascade,regressor,scale, tryflip );
                         c = waitKey(0);
@@ -148,7 +150,7 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade,
     cvtColor( img, gray, CV_BGR2GRAY );
     resize( gray, smallImg, smallImg.size(), 0, 0, INTER_LINEAR );
     equalizeHist( smallImg, smallImg );
-    
+
     // --Detection
     t = (double)cvGetTickCount();
     cascade.detectMultiScale( smallImg, faces,
@@ -174,21 +176,21 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade,
     }
     t = (double)cvGetTickCount() - t;
     printf( "detection time = %g ms\n", t/((double)cvGetTickFrequency()*1000.) );
-    
+
     // --Alignment
     t =(double)cvGetTickCount();
     for( vector<Rect>::const_iterator r = faces.begin(); r != faces.end(); r++, i++ ){
         Point center;
         Scalar color = colors[i%8];
         BoundingBox boundingbox;
-        
+
         boundingbox.start_x = r->x*scale;
         boundingbox.start_y = r->y*scale;
         boundingbox.width   = (r->width-1)*scale;
         boundingbox.height  = (r->height-1)*scale;
         boundingbox.centroid_x = boundingbox.start_x + boundingbox.width/2.0;
         boundingbox.centroid_y = boundingbox.start_y + boundingbox.height/2.0;
-        
+
         t =(double)cvGetTickCount();
         Mat_<double> current_shape = regressor.Predict(gray,boundingbox,1);
         t = (double)cvGetTickCount() - t;
@@ -197,7 +199,7 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade,
 //        rectangle(img, cvPoint(boundingbox.start_x,boundingbox.start_y),
 //                  cvPoint(boundingbox.start_x+boundingbox.width,boundingbox.start_y+boundingbox.height),Scalar(0,255,0), 1, 8, 0);
         // draw result :: red
-        for(int i = 0;i < global_params.landmark_num;i++){
+        for(int i = 0;i < global.config.landmark_num;i++){
              circle(img,Point2d(current_shape(i,0),current_shape(i,1)),3,Scalar(255,255,255),-1,8,0);
         }
     }
@@ -207,4 +209,5 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade,
         save_count++;
         imwrite(to_string(save_count)+".jpg", img);
     }
+}
 }

@@ -32,9 +32,16 @@
 #include <numeric>
 #include <utility>
 
-extern Config global_params;
-extern std::string modelPath;
-extern std::string dataPath;
+
+namespace FaceAlignment {
+
+class App {
+public:
+  Config config;
+};
+
+extern App global;
+
 class BoundingBox{
     public:
         double start_x;
@@ -98,4 +105,7 @@ double TestModel(std::vector<std::string> testDataName);
 int FaceDetectionAndAlignment(const char* inputname);
 void ReadGlobalParamFromFile(std::string path);
 double CalculateError(const cv::Mat_<double>& ground_truth_shape, const cv::Mat_<double>& predicted_shape);
+
+}
+
 #endif

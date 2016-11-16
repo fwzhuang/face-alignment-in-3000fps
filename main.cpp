@@ -1,15 +1,17 @@
 #include "LBF.h"
 #include "LBFRegressor.h"
+
 using namespace std;
 using namespace cv;
+using namespace FaceAlignment;
 
 void PrintHelp(){
-    cout << "Useage:"<<endl;
-    cout << "1. train your own model:    LBF.out  TrainModel "<<endl;
-    cout << "2. test model on dataset:   LBF.out  TestModel"<<endl;
-    cout << "3. test model via a camera: LBF.out  Demo "<<endl;
-    cout << "4. test model on a pic:     LBF.out  Demo xx.jpg"<<endl;
-    cout << "5. test model on pic set:   LBF.out  Demo Img_Path.txt"<<endl;
+    cout << "Usage:"<<endl;
+    cout << "1. train your own model:    LBF.out TrainModel "<<endl;
+    cout << "2. test model on dataset:   LBF.out TestModel"<<endl;
+    cout << "3. test model via a camera: LBF.out Demo "<<endl;
+    cout << "4. test model on a pic:     LBF.out Demo xx.jpg"<<endl;
+    cout << "5. test model on pic set:   LBF.out Demo Img_Path.txt"<<endl;
     cout << endl;
 
 }
@@ -25,7 +27,7 @@ int main( int argc, const char** argv ){
     }
 
     if (! training) {
-      global_params.read(modelPath + "LBF.model");
+      global.config.read(global.config.model_path + "LBF.model");
     }
 
     if(strcmp(argv[1],"TrainModel")==0){

@@ -11,6 +11,9 @@
 
 #include "RandomForest.h"
 #include "liblinear/linear.h"
+
+namespace FaceAlignment {
+
 class LBFRegressor{
 public:
     std::vector<RandomForest> RandomForest_;
@@ -20,12 +23,12 @@ public:
     int max_numstage_;
 public:
     LBFRegressor(){
-        max_numstage_ = global_params.max_numstage;
+        max_numstage_ = global.config.max_numstage;
         RandomForest_.resize(max_numstage_);
         Models_.resize(max_numstage_);
     }
     ~LBFRegressor(){
-        
+
     }
     void Read(std::ifstream& fin);
     void Write(std::ofstream& fout);
@@ -35,7 +38,7 @@ public:
                                             const std::vector<cv::Mat_<uchar> >& images,
                                             const std::vector<cv::Mat_<double> >& current_shapes,
                                             const std::vector<BoundingBox> & bounding_boxs);
-    
+
     void ReleaseFeatureSpace(struct feature_node ** binfeatures,
                              int num_train_sample);
     int   GetCodefromTree(const Tree& tree,
@@ -62,16 +65,16 @@ public:
                           int num_feature,
                           int num_train_sample,
                           int stage);
-    
+
     void GlobalPrediction(struct feature_node**,
                           std::vector<cv::Mat_<double> >& current_shapes,
                           const std::vector<BoundingBox> & bounding_boxs,
                           int stage);
-    
+
     void Train(const std::vector<cv::Mat_<uchar> >& images,
                const std::vector<cv::Mat_<double> >& ground_truth_shapes,
                const std::vector<BoundingBox> & bounding_boxs);
-    
+
     std::vector<cv::Mat_<double> > Predict(const std::vector<cv::Mat_<uchar> >& images,
                                            const std::vector<BoundingBox>& bounding_boxs,
                                            const std::vector<cv::Mat_<double> >& ground_truth_shapes,
@@ -83,7 +86,8 @@ public:
     void ReadGlobalParam(std::ifstream& fin);
     void WriteRegressor(std::ofstream& fout);
     void ReadRegressor(std::ifstream& fin);
-    
+
 };
 
+}
 #endif
