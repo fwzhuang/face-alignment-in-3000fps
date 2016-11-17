@@ -93,21 +93,24 @@ vector<Mat_<double>> App::align_faces(Mat & gray, vector<Rect> & faces)
     return result;
 }
 
+void App::draw_face(Mat & img, Mat_<double> &shape)
+{
+  // draw bounding box
 
+  // rectangle(out_img, cvPoint(boundingbox.start_x,boundingbox.start_y),
+  //           cvPoint(boundingbox.start_x+boundingbox.width,boundingbox.start_y+boundingbox.height),Scalar(0,255,0), 1, 8, 0);
 
-void App::draw_faces(Mat & img, vector<Mat_<double>> &shapes)
+  // draw result :: red
+  for(int i = 0; i < global_config.landmark_num; i++) {
+    circle(img, Point2d(shape(i,0), shape(i,1)), 3, Scalar(255,255,255), -1, 8, 0);
+  }
+}
+
+void App::show_faces(Mat & img, vector<Mat_<double>> &shapes)
 {
     int save_count=0;
     for(auto current_shape: shapes) {
-        // draw bounding box
-
-        // rectangle(out_img, cvPoint(boundingbox.start_x,boundingbox.start_y),
-        //           cvPoint(boundingbox.start_x+boundingbox.width,boundingbox.start_y+boundingbox.height),Scalar(0,255,0), 1, 8, 0);
-
-        // draw result :: red
-        for(int i = 0; i < global_config.landmark_num; i++){
-            circle(img, Point2d(current_shape(i,0), current_shape(i,1)), 3, Scalar(255,255,255), -1, 8, 0);
-        }
+      draw_face(img, current_shape);
     }
 
     cv::imshow( "result", img );
@@ -118,17 +121,17 @@ void App::draw_faces(Mat & img, vector<Mat_<double>> &shapes)
     }
 }
 
-void App::align_image_and_draw(Mat& img)
+void App::align_image_and_show(Mat& img)
 {
     Mat gray;
     cvtColor( img, gray, CV_BGR2GRAY );
 
     vector<Rect> faces = detect_faces_with_scale(gray, global_config.scale);
     vector<Mat_<double>> shapes = align_faces(gray, faces);
-    draw_faces(img, shapes);
+    show_faces(img, shapes);
 }
 
-void App::align_captures_and_draw(CvCapture *capture)
+void App::align_captures_and_show(CvCapture *capture)
 {
     Mat frame, frameCopy;
 
@@ -142,7 +145,7 @@ void App::align_captures_and_draw(CvCapture *capture)
         else
             flip( frame, frameCopy, 0 );
 
-        align_image_and_draw( frameCopy);
+        align_image_and_show( frameCopy);
 
         if( waitKey( 10 ) >= 0 )
             break;

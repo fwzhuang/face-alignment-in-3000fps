@@ -26,13 +26,15 @@ class App {
 
   vector<Mat_<double>> align_faces(Mat & gray, vector<Rect> & faces);
 
-  void draw_faces(Mat & img, vector<Mat_<double>> &shapes);
+  void draw_face(Mat & img, Mat_<double> &shape);
 
-  void align_image_and_draw(Mat& img);
+  void show_faces(Mat & img, vector<Mat_<double>> &shapes);
 
-  void align_captures_and_draw(CvCapture *capture);
+  void align_image_and_show(Mat& img);
 
-  void align_filename_list_and_draw(string filename);
+  void align_captures_and_show(CvCapture *capture);
+
+  void align_filename_list_and_show(string filename);
 
 
 private:

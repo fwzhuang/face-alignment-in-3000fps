@@ -18,7 +18,7 @@ void PrintHelp(){
 
 }
 
-void align_filename_list_and_draw(App & app, string filename)
+void align_filename_list_and_show(App & app, string filename)
 {
     /* Input is a text file containing the list of the image filenames to be
        processed - one per line */
@@ -36,7 +36,7 @@ void align_filename_list_and_draw(App & app, string filename)
             cout << "file " << buf << endl;
             image = imread( buf, 1 );
             if( !image.empty() ){
-                app.align_image_and_draw(image);
+                app.align_image_and_show(image);
                 c = waitKey(0);
                 if( c == 27 || c == 'q' || c == 'Q' )
                     break;
@@ -86,14 +86,14 @@ int align_inputname(App & app, string input_name) {
     // cvNamedWindow( "result", 1 );
     // -- 2. Read the video stream
     if( capture ){
-        app.align_captures_and_draw(capture);
+        app.align_captures_and_show(capture);
     }
     else if( !image.empty() ){
-        app.align_image_and_draw(image);
+        app.align_image_and_show(image);
         waitKey(0);
     }
     else if( !input_name.empty() ){
-        align_filename_list_and_draw(app, input_name);
+        align_filename_list_and_show(app, input_name);
     }
 
     cvDestroyWindow("result");
