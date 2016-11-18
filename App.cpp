@@ -3,6 +3,12 @@
 
 namespace FaceAlignment {
 
+App::App() : App(global_config.cascade_name,
+		 global_config.model_path + "LBF.model",
+		 global_config.model_path + "Regressor.model")
+{
+}
+
 App::App(string cascade_model_path, string lbf_model_path, string regressor_model_path) {
 
   cascade.load(cascade_model_path);
@@ -153,5 +159,6 @@ void App::align_captures_and_show(CvCapture *capture)
 
     cvReleaseCapture( &capture );
 }
+
 
 }

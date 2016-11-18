@@ -14,6 +14,8 @@ namespace FaceAlignment {
 class App {
  public:
 
+  App();
+
   App(string cascade_model_path,
       string lbf_model_path,
       string regressor_model_path);
@@ -35,7 +37,6 @@ class App {
   void align_captures_and_show(CvCapture *capture);
 
   void align_filename_list_and_show(string filename);
-
 
 private:
 
