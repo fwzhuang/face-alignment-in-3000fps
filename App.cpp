@@ -1,5 +1,24 @@
 #include "App.h"
 
+BOOST_PYTHON_MODULE(FaceAlign)
+{
+
+  using namespace py;
+  class_<FaceAlignment::App>("FaceAlign")
+    .def(init<string, string, string>())
+    .def("align_face", &FaceAlignment::App::align_face)
+    .def("align_face_with_ptr", &FaceAlignment::App::align_face_with_ptr);
+
+
+  class_<cv::Rect>("Rect", init<>())
+    .def(init<int, int, int, int>())
+    .def_readwrite("x", &Rect::x)
+    .def_readwrite("y", &Rect::y)
+    .def_readwrite("width", &Rect::width)
+    .def_readwrite("height", &Rect::height);
+}
+
+
 
 namespace FaceAlignment {
 
@@ -11,7 +30,10 @@ App::App() : App(global_config.cascade_name,
 
 App::App(string cascade_model_path, string lbf_model_path, string regressor_model_path) {
 
-  cascade.load(cascade_model_path);
+  if (! cascade.load(cascade_model_path)) {
+    cout << "Faile to load cascade " << cascade_model_path << endl;
+    exit(1);
+  };
   regressor.Load(lbf_model_path, regressor_model_path);
 
 }
@@ -69,10 +91,39 @@ vector<Rect> App::detect_faces_with_scale(Mat & img, double scale)
     return faces;
 }
 
+py::object App::align_face_with_ptr(int rows, int cols, long img_data, Rect & r)
+{
+  Mat gray(rows, cols, CV_8UC1, (void*)img_data);
+
+  vector<Rect> faces = detect_faces_with_scale(gray, 1);
+
+  py::list result;
+  if (faces.size() > 0 )
+  {
+      cout << "face from joint: " << r.x << " " << r.y << " " << r.width << " " << r.height << endl;
+      cout << "face from cascade: " << faces[0].x << " " << faces[0].y << " " << faces[0].width << " " << faces[0].height << endl;
+
+      auto shape = align_face(gray, faces[0]);
+
+      for(int i = 0; i < global_config.landmark_num; i++) {
+          py::list item;
+          item.append(shape(i, 0));
+          item.append(shape(i, 1));
+          result.append(item);
+      }
+
+      draw_face(gray, shape);
+  }
+
+
+  return result;
+}
+
 Mat_<double> App::align_face(Mat & gray, Rect & r)
 {
     double t = (double)cvGetTickCount();
     Point center;
+
     BoundingBox boundingbox;
 
     boundingbox.start_x = r.x;

@@ -5,9 +5,11 @@
 #include <vector>
 #include "Config.h"
 #include "LBFRegressor.h"
+#include <boost/python.hpp>
 
 using namespace std;
 using namespace cv;
+namespace py = boost::python;
 
 namespace FaceAlignment {
 
@@ -25,6 +27,8 @@ class App {
   vector<Rect> detect_faces_with_scale(Mat & img, double scale);
 
   Mat_<double> align_face(Mat & gray, Rect & r);
+
+  py::object align_face_with_ptr(int rows, int cols, long img_data, Rect & r);
 
   vector<Mat_<double>> align_faces(Mat & gray, vector<Rect> & faces);
 
