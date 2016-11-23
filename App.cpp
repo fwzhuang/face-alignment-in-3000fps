@@ -95,26 +95,32 @@ py::object App::align_face_with_ptr(int rows, int cols, long img_data, Rect & r)
 {
   Mat gray(rows, cols, CV_8UC1, (void*)img_data);
 
-  vector<Rect> faces = detect_faces_with_scale(gray, 1);
+  // vector<Rect> faces = detect_faces_with_scale(gray, 1);
 
   py::list result;
-  if (faces.size() > 0 )
-  {
-      cout << "face from joint: " << r.x << " " << r.y << " " << r.width << " " << r.height << endl;
-      cout << "face from cascade: " << faces[0].x << " " << faces[0].y << " " << faces[0].width << " " << faces[0].height << endl;
+  // if (faces.size() > 0 )
+  // {
+  //     cout << "face from cascade: " << faces[0].x << " " << faces[0].y << " " << faces[0].width << " " << faces[0].height << endl;
 
-      auto shape = align_face(gray, faces[0]);
+      // auto shape = align_face(gray, faces[0]);
 
-      for(int i = 0; i < global_config.landmark_num; i++) {
-          py::list item;
-          item.append(shape(i, 0));
-          item.append(shape(i, 1));
-          result.append(item);
-      }
+      // for(int i = 0; i < global_config.landmark_num; i++) {
+      //     py::list item;
+      //     item.append(shape(i, 0));
+      //     item.append(shape(i, 1));
+      //     result.append(item);
+      // }
 
-      draw_face(gray, shape);
+      // draw_face(gray, shape);
+  // }
+
+  auto shape = align_face(gray, r);
+  for(int i = 0; i < global_config.landmark_num; i++) {
+      py::list item;
+      item.append(shape(i, 0));
+      item.append(shape(i, 1));
+      result.append(item);
   }
-
 
   return result;
 }

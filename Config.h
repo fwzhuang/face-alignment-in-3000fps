@@ -30,8 +30,8 @@ class Config {
   string data_path;
   string cascade_name;
 
-  const double scale;
   const bool try_flip;
+  const double scale;
 };
 extern Config global_config;
 
