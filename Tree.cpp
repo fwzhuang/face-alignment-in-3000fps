@@ -10,6 +10,8 @@
 using namespace std;
 using namespace cv;
 
+namespace FaceAlignment {
+
 inline double calculate_var(const vector<double>& v_1 ){
     if (v_1.size() == 0)
         return 0;
@@ -17,13 +19,13 @@ inline double calculate_var(const vector<double>& v_1 ){
     double mean_1 = mean(v1)[0];
     double mean_2 = mean(v1.mul(v1))[0];
     return mean_2 - mean_1*mean_1;
-    
+
 }
 inline double calculate_var(const Mat_<double>& v1){
     double mean_1 = mean(v1)[0];
     double mean_2 = mean(v1.mul(v1))[0];
     return mean_2 - mean_1*mean_1;
-    
+
 }
 
 void Tree::Train(const vector<Mat_<uchar> >& images,
@@ -38,11 +40,11 @@ void Tree::Train(const vector<Mat_<uchar> >& images,
                  ){
     // set the parameter
     landmarkID_ = landmarkID; // start from 0
-    max_numfeats_ = global_params.max_numfeats[stages];
-    max_radio_radius_ = global_params.max_radio_radius[stages];
+    max_numfeats_ = global_config.max_numfeats[stages];
+    max_radio_radius_ = global_config.max_radio_radius[stages];
     num_nodes_ = 1;
     num_leafnodes_ = 1;
-    
+
     // index: indicate the training samples id in images
     int num_nodes_iter;
     int num_split;
@@ -64,7 +66,7 @@ void Tree::Train(const vector<Mat_<uchar> >& images,
         nodes_[0].feat[i] = 1;
     }
     nodes_[0].ind_samples = index;
-    
+
 
     bool stop = 0;
     int num_nodes = 1;
@@ -100,7 +102,7 @@ void Tree::Train(const vector<Mat_<uchar> >& images,
                     nodes_[n].isleafnode = false;
                     nodes_[n].cnodes[0] = num_nodes ;
                     nodes_[n].cnodes[1] = num_nodes +1;
-                    
+
                     //add left and right child nodes into the random tree
                     nodes_[num_nodes].ind_samples = lcind;
                     nodes_[num_nodes].issplit = false;
@@ -117,14 +119,14 @@ void Tree::Train(const vector<Mat_<uchar> >& images,
                     nodes_[num_nodes +1].cnodes[0] = 0;
                     nodes_[num_nodes +1].cnodes[1] = 0;
                     nodes_[num_nodes +1].isleafnode = true;
-                    
+
                     num_split++;
                     num_leafnodes++;
                     num_nodes +=2;
                 }
             }
-            
-            
+
+
         }
         if (num_split == 0){
             stop = 1;
@@ -134,7 +136,7 @@ void Tree::Train(const vector<Mat_<uchar> >& images,
             num_leafnodes_ = num_leafnodes;
         }
     }
-    
+
     id_leafnodes_.clear();
     for (int i=0;i < num_nodes_;i++){
         if (nodes_[i].isleafnode == 1){
@@ -203,7 +205,7 @@ void Tree::Splitnode(const vector<Mat_<uchar> >& images,
             int real_y1 = project_y1 + current_shapes[ind_samples[i]](landmarkID_,1);
             real_x1 = max(0.0,min((double)real_x1,images[ind_samples[i]].cols-1.0));
             real_y1 = max(0.0,min((double)real_y1,images[ind_samples[i]].rows-1.0));
-            
+
             double project_x2 = rotation(0,0) * candidate_pixel_locations(j,2) + rotation(0,1) * candidate_pixel_locations(j,3);
             double project_y2 = rotation(1,0) * candidate_pixel_locations(j,2) + rotation(1,1) * candidate_pixel_locations(j,3);
             project_x2 = scale * project_x2 * bounding_box[ind_samples[i]].width / 2.0;
@@ -212,7 +214,7 @@ void Tree::Splitnode(const vector<Mat_<uchar> >& images,
             int real_y2 = project_y2 + current_shapes[ind_samples[i]](landmarkID_,1);
             real_x2 = max(0.0,min((double)real_x2,images[ind_samples[i]].cols-1.0));
             real_y2 = max(0.0,min((double)real_y2,images[ind_samples[i]].rows-1.0));
-            
+
             densities(j,i) = ((int)(images[ind_samples[i]](real_y1,real_x1))-(int)(images[ind_samples[i]](real_y2,real_x2)));
         }
     }
@@ -263,7 +265,7 @@ void Tree::Splitnode(const vector<Mat_<uchar> >& images,
             max_id = i;
         }
     }
-    
+
     isvaild = 1;
     feat[0] =candidate_pixel_locations(max_id,0)/max_radio_radius_;
     feat[1] =candidate_pixel_locations(max_id,1)/max_radio_radius_;
@@ -293,13 +295,13 @@ void Tree::Write(std:: ofstream& fout){
     fout << max_radio_radius_<<endl;
    // fout << overlap_ration_ << endl;
     fout << 0.4 << endl;
-    
+
     fout << id_leafnodes_.size()<<endl;
     for (int i=0;i<id_leafnodes_.size();i++){
         fout << id_leafnodes_[i]<< " ";
     }
     fout <<endl;
-    
+
     for (int i=0; i <max_numnodes_;i++){
         nodes_[i].Write(fout);
     }
@@ -319,10 +321,9 @@ void Tree::Read(std::ifstream& fin){
     for (int i=0;i<num;i++){
         fin >> id_leafnodes_[i];
     }
-    
+
     for (int i=0; i <max_numnodes_;i++){
         nodes_[i].Read(fin);
     }
 }
-
-
+}

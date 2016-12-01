@@ -11,6 +11,8 @@
 
 #include "Tree.h"
 
+namespace FaceAlignment {
+
 class RandomForest{
 public:
     std::vector<std::vector<Tree> > rfs_;
@@ -19,14 +21,14 @@ public:
     int max_depth_;
     int stages_;
     double overlap_ratio_;
-    
-    
+
+
     RandomForest(){
-        max_numtrees_ = global_params.max_numtrees;
-        num_landmark_ = global_params.landmark_num;
-        max_depth_    = global_params.max_depth;
-        overlap_ratio_ = global_params.bagging_overlap;
-        
+        max_numtrees_ = global_config.max_numtrees;
+        num_landmark_ = global_config.landmark_num;
+        max_depth_    = global_config.max_depth;
+        overlap_ratio_ = global_config.bagging_overlap;
+
         // resize the trees
         rfs_.resize(num_landmark_);
         for (int i=0;i<num_landmark_;i++){
@@ -46,5 +48,6 @@ public:
 };
 
 
+}
 
 #endif /* defined(__myopencv__RandomForest__) */

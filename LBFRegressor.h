@@ -11,6 +11,9 @@
 
 #include "RandomForest.h"
 #include "liblinear/linear.h"
+
+namespace FaceAlignment {
+
 class LBFRegressor{
 public:
     std::vector<RandomForest> RandomForest_;
@@ -20,22 +23,20 @@ public:
     int max_numstage_;
 public:
     LBFRegressor(){
-        max_numstage_ = global_params.max_numstage;
+        max_numstage_ = global_config.max_numstage;
         RandomForest_.resize(max_numstage_);
         Models_.resize(max_numstage_);
     }
     ~LBFRegressor(){
-        
+
     }
-    void Read(std::ifstream& fin);
-    void Write(std::ofstream& fout);
-    void Load(std::string path);
-    void Save(std::string path);
+    void Load(std::string lbf_model_path, string regressor_model_path);
+    void Save(std::string lbf_model_path, string regressor_model_path);
     struct feature_node ** DeriveBinaryFeat(const RandomForest& randf,
                                             const std::vector<cv::Mat_<uchar> >& images,
                                             const std::vector<cv::Mat_<double> >& current_shapes,
                                             const std::vector<BoundingBox> & bounding_boxs);
-    
+
     void ReleaseFeatureSpace(struct feature_node ** binfeatures,
                              int num_train_sample);
     int   GetCodefromTree(const Tree& tree,
@@ -62,28 +63,27 @@ public:
                           int num_feature,
                           int num_train_sample,
                           int stage);
-    
+
     void GlobalPrediction(struct feature_node**,
                           std::vector<cv::Mat_<double> >& current_shapes,
                           const std::vector<BoundingBox> & bounding_boxs,
                           int stage);
-    
+
     void Train(const std::vector<cv::Mat_<uchar> >& images,
                const std::vector<cv::Mat_<double> >& ground_truth_shapes,
                const std::vector<BoundingBox> & bounding_boxs);
-    
+
     std::vector<cv::Mat_<double> > Predict(const std::vector<cv::Mat_<uchar> >& images,
                                            const std::vector<BoundingBox>& bounding_boxs,
-                                           const std::vector<cv::Mat_<double> >& ground_truth_shapes,
-                                           int initial_num);
+                                           const std::vector<cv::Mat_<double> >& ground_truth_shapes);
     cv::Mat_<double>  Predict(const cv::Mat_<uchar>& image,
-                              const BoundingBox& bounding_box,
-                              int initial_num);
-    void WriteGlobalParam(std::ofstream& fout);
-    void ReadGlobalParam(std::ifstream& fin);
-    void WriteRegressor(std::ofstream& fout);
-    void ReadRegressor(std::ifstream& fin);
-    
+                              const BoundingBox& bounding_box);
+
+private:
+    void WriteRegressor(std::ofstream& fout, string regressor_model_path);
+    void ReadRegressor(std::ifstream& fin, string regressor_model_path);
+
 };
 
+}
 #endif

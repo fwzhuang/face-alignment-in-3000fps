@@ -11,6 +11,8 @@
 using namespace std;
 using namespace cv;
 
+namespace FaceAlignment {
+
 void RandomForest::Train(
                          const vector<Mat_<uchar> >& images,
                          const vector<Mat_<double> >& ground_truth_shapes,
@@ -66,4 +68,5 @@ void RandomForest::Read(std::ifstream& fin){
             rfs_[i][j].Read(fin);
         }
     }
+}
 }
